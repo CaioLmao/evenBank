@@ -1,259 +1,207 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_projeto_banco/utilitarios/padrao_cores.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const HelloWorldApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HelloWorldApp extends StatelessWidget {
+  const HelloWorldApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Even Bank',
-      theme: ThemeData(primarySwatch: Colors.deepOrange),
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: LoginPage(),
+      routes: {
+        '/welcome': (context) => WelcomePage(),
+        '/password-recovery': (context) => PasswordRecoveryPage(),
+      },
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  bool _censurado = false;
+class _LoginPageState extends State<LoginPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _errorMessage = '';
 
-  void _alternarCensura() {
-    setState(() {
-      _censurado = !_censurado;
-    });
+  void _login() {
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage = 'Por favor, preencha todos os campos.';
+      });
+    } else {
+      Navigator.pushNamed(context, '/welcome', arguments: username);
+    }
+  }
+
+  void _navigateToPasswordRecovery() {
+    Navigator.pushNamed(context, '/password-recovery');
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double _saldo = 420.69;
-
-    dynamic _textoCensurado = _censurado ? '***' : _saldo;
-
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: _appBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(gradient: gradiente()),
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  ClipOval(
-                    child: Image.network(
-                      'https://upload.wikimedia.org/wikipedia/en/e/e1/PJAlive.jpg',
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Pearl Jam',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            DecoratedBox(
-              decoration: BoxDecoration(color: Colors.grey),
-              child: Container(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Saldo \$',
-                          style: TextStyle(fontSize: 30),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'R\$ $_textoCensurado',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15),
-                            child: ElevatedButton(
-                              onPressed: _alternarCensura,
-                              child: Text('Ver Saldo'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )),
-            ),
-            SizedBox(height: 16),
-            Container(
-              height: 200, // Altura da caixa grande
-              child: Image.network(
-                'https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/PearlJam-Ten2.jpg/220px-PearlJam-Ten2.jpg', // URL da imagem
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      appBar: AppBar(
+        title: const Text('Login'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          width: 300, // Diminui o tamanho do container
+          decoration: BoxDecoration(
+            color: Colors.orange[100],
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SegundaTela()),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        'https://imagensfree.com.br/wp-content/uploads/2022/01/icone-pix.png',
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(height: 8),
-                      Text('Pix'),
-                    ],
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TerceiraTela()),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        'https://cdn.icon-icons.com/icons2/2566/PNG/512/transfer_icon_153324.png',
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(height: 8),
-                      Text('Transferir'),
-                    ],
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
                   ),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => QuartaTela()),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        'https://cdn-icons-png.flaticon.com/512/4021/4021708.png',
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(height: 8),
-                      Text('Cartão'),
-                    ],
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green, // Altera a cor do botão para verde
                   ),
+                  child: const Text('Login'),
                 ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SegundaTela()),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        'https://cdn-icons-png.flaticon.com/512/858/858151.png',
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(
+                        color: Colors.red,
                       ),
-                      SizedBox(height: 8),
-                      Text('Cotação'),
-                    ],
+                    ),
+                  ),
+                const SizedBox(height: 8.0),
+                TextButton(
+                  onPressed: _navigateToPasswordRecovery,
+                  child: const Text(
+                    'Esqueceu a senha?',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-PreferredSize _appBar() {
-  return PreferredSize(
-      child: AppBar(
-        elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-      ),
-      preferredSize: const Size.fromHeight(0));
-}
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({Key? key}) : super(key: key);
 
-class SegundaTela extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final username = ModalRoute.of(context)!.settings.arguments as String?;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Segunda Tela'),
+        title: const Text('Welcome'),
       ),
       body: Center(
-        child: Text('Conteúdo da segunda tela'),
+        child: Text('Hello, $username!'),
       ),
     );
   }
 }
 
-class TerceiraTela extends StatelessWidget {
+class PasswordRecoveryPage extends StatefulWidget {
+  const PasswordRecoveryPage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Terceira Tela'),
-      ),
-      body: Center(
-        child: Text('Conteúdo da terceira tela'),
-      ),
-    );
-  }
+  _PasswordRecoveryPageState createState() => _PasswordRecoveryPageState();
 }
 
-class QuartaTela extends StatelessWidget {
+class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _recoverPassword() {
+    final email = _emailController.text;
+
+    if (email.isNotEmpty) {
+      print('Recuperando a senha para o email: $email');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quarta Tela'),
+        title: const Text('Recuperação de Senha'),
       ),
-      body: Center(
-        child: Text('Conteúdo da quarta tela'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          width: 300, // Diminui o tamanho do container
+          decoration: BoxDecoration(
+            color: Colors.orange[100],
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email de Confiança',
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _recoverPassword,
+                  child: const Text('Recuperar Senha'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
